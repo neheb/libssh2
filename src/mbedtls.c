@@ -497,8 +497,8 @@ int
 _libssh2_mbedtls_rsa_sha2_verify(libssh2_rsa_ctx * rsactx,
                                  size_t hash_len,
                                  const unsigned char *sig,
-                                 unsigned long sig_len,
-                                 const unsigned char *m, unsigned long m_len)
+                                 size_t sig_len,
+                                 const unsigned char *m, size_t m_len)
 {
     int ret;
     int md_type;
@@ -548,8 +548,8 @@ _libssh2_mbedtls_rsa_sha2_verify(libssh2_rsa_ctx * rsactx,
 int
 _libssh2_mbedtls_rsa_sha1_verify(libssh2_rsa_ctx * rsactx,
                                  const unsigned char *sig,
-                                 unsigned long sig_len,
-                                 const unsigned char *m, unsigned long m_len)
+                                 size_t sig_len,
+                                 const unsigned char *m, size_t m_len)
 {
     return _libssh2_mbedtls_rsa_sha2_verify(rsactx, SHA_DIGEST_LENGTH,
                                             sig, sig_len, m, m_len);
