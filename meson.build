@@ -12,6 +12,7 @@ pkgconfig = import('pkgconfig')
 libssh2_config = configuration_data()
 
 cargs = ['-DHAVE_CONFIG_H']
+export = []
 
 if host_machine.system() == 'windows'
   if cc.get_argument_syntax() == 'msvc'
@@ -20,10 +21,12 @@ if host_machine.system() == 'windows'
 
   if get_option('default_library') != 'static' and cc.has_function_attribute('dllimport')
     libssh2_config.set('LIBSSH2_API', '__declspec(dllimport)')
+    export = '-DLIBSSH2_API=__declspec(dllimport)'
   endif
 else
   if cc.has_function_attribute('visibility:default')
     libssh2_config.set('LIBSSH2_API', '__attribute__ ((__visibility__ ("default")))')
+    export = '-DLIBSSH2_API=__attribute__ ((__visibility__ ("default")))'
   endif
 endif
 
@@ -179,7 +182,8 @@ abi_version = '1.0.1'
 libssh2_lib = library(
   'ssh2',
   libssh2_sources,
-  c_args: cargs,
+  c_args: [cargs, export],
+  gnu_symbol_visibility: 'hidden',
   include_directories: inc_dir,
   dependencies: libssh2_deps,
   install: true,
@@ -187,7 +191,13 @@ libssh2_lib = library(
   soversion: host_machine.system() == 'windows' ? '' : '1',
 )
 
+import = []
+if host_machine.system() == 'windows' and get_option('default_library') != 'static'
+  import = '__declspec(dllimport)'
+endif
+
 libssh2_dep = declare_dependency(
+  compile_args: import,
   include_directories: inc_dir,
   link_with: libssh2_lib,
 )
